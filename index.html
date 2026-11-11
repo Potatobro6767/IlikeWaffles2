@@ -1,0 +1,174 @@
+<html><head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <!-- Google Fonts -->
+                <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans&amp;display=swap" rel="stylesheet">
+                <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&amp;display=swap" rel="stylesheet">
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@arcade-v/arcade_v/navigation/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+            <script>
+                // Change the iframe content when a link is clicked
+                function changeIframeContent(page) {
+                    document.getElementById('Game').src = page;
+                    updateActiveLink(page);
+                    const contentContainer = document.getElementById('content-container');
+                    contentContainer.style.display = 'none'; // Hide content-container
+                }
+
+                // Load the Blob content and update the iframe
+                function loadBlobContent(url) {
+                    loadPageContent(url, function(content) {
+                        var blob = new Blob([content], {type: 'text/html'});
+                        var iframe = document.getElementById('Game');
+                        iframe.src = URL.createObjectURL(blob);
+                        updateActiveLink(url);
+                        const contentContainer = document.getElementById('content-container');
+                        contentContainer.style.display = 'none'; // Hide content-container
+                        document.getElementById("Game").style.display = "block"; // Show the iframe
+                    });
+                }
+
+function loadPageContent(url, callback) {
+    const xhttp = new XMLHttpRequest();
+
+    // Show spinner
+    document.getElementById('spinner').style.display = 'flex';
+
+    const urlWithNoCache = url + (url.includes('?') ? '&' : '?') + 'nocache=' + new Date().getTime();
+    
+    xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            // Hide spinner after request completes
+            document.getElementById('spinner').style.display = 'none';
+
+            if (this.status === 200) {
+                callback(this.responseText);
+            } else {
+                console.error('Failed to load:', url);
+            }
+        }
+    };
+
+    xhttp.open("GET", urlWithNoCache, true);
+    xhttp.send();
+}
+
+
+
+// Function to trigger fullscreen mode for the iframe or content-container
+function triggerFullscreen() {
+    const contentContainer = document.querySelector('.content-container');
+    const iframe = document.getElementById('Game');
+    
+    // Check if the content container is visible
+    const isContentVisible = contentContainer && contentContainer.offsetWidth > 0 && contentContainer.offsetHeight > 0;
+
+    // If content-container is visible, make it fullscreen
+    if (isContentVisible) {
+        if (contentContainer.requestFullscreen) {
+            contentContainer.requestFullscreen();
+        } else if (contentContainer.mozRequestFullScreen) { // Firefox
+            contentContainer.mozRequestFullScreen();
+        } else if (contentContainer.webkitRequestFullscreen) { // Chrome, Safari, Opera
+            contentContainer.webkitRequestFullscreen();
+        } else if (contentContainer.msRequestFullscreen) { // IE/Edge
+            contentContainer.msRequestFullscreen();
+        }
+    }
+    // If content-container is hidden, make the iframe fullscreen
+    else if (iframe) {
+        if (iframe.requestFullscreen) {
+            iframe.requestFullscreen();
+        } else if (iframe.mozRequestFullScreen) { // Firefox
+            iframe.mozRequestFullScreen();
+        } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari, Opera
+            iframe.webkitRequestFullscreen();
+        } else if (iframe.msRequestFullscreen) { // IE/Edge
+            iframe.msRequestFullscreen();
+        }
+    }
+}
+
+
+                // Function to change page content and update the active link
+function changePageContent(url, callback = null) {
+    loadPageContent(url, function(content) {
+        const container = document.getElementById('content-container');
+        container.innerHTML = content;
+        const iframe = document.getElementById("Game");
+        iframe.src = "about:blank";
+        if (callback) callback();  // Run any extra logic after content is loaded
+    });
+    updateActiveLink(url);
+    const iframe = document.getElementById("Game");
+    iframe.style.display = "none"; // Hide the iframe
+    const contentContainer = document.getElementById('content-container');
+    contentContainer.style.display = 'block'; // Show content-container
+}
+
+
+                // Function to append external JavaScript files
+function appendScript(url, callback = null) {
+  const script = document.createElement('script');
+  script.src = url;
+  script.type = 'text/javascript';
+  script.onload = () => {
+    if (callback) callback();
+  };
+  script.onerror = () => {
+  };
+  document.body.appendChild(script);
+}
+
+function loadGamesmenu() {
+    changePageContent('https://cdn.jsdelivr.net/npm/@arcade-v/arcade_v/navigation/games/games.html', () => {
+        appendScript('https://cdn.jsdelivr.net/npm/@arcade-v/arcade_v/navigation/games/games.js', () => {
+            if (typeof fetchGames === 'function') {
+                fetchGames(); 
+            }
+        });
+        appendScript('https://cdn.jsdelivr.net/npm/@arcade-v/arcade_v/navigation/customization.js');
+    });
+}
+
+                // Update active link based on URL
+                function updateActiveLink(url) {
+                    document.querySelectorAll('ul li a').forEach(link => {
+                        link.classList.remove('active');
+                    });
+
+                    const activeLink = document.querySelector(`a[onclick*="${url}"]`);
+                    if (activeLink) {
+                        activeLink.classList.add('active');
+                        document.getElementById("Game").style.display = "block"; // Show the iframe
+                    }
+
+                }
+changePageContent('https://cdn.jsdelivr.net/npm/@arcade-v/arcade_v/navigation/home.html', () => {
+         appendScript('https://cdn.jsdelivr.net/npm/@arcade-v/arcade_v/navigation/home.js', () => {
+           if (typeof displayRandomQuote === 'function') {
+             displayRandomQuote();
+           }
+         });
+         appendScript('https://cdn.jsdelivr.net/npm/@arcade-v/arcade_v/navigation/customization.js');
+       });
+if (localStorage.getItem("faviconSrc") == null) {
+    localStorage.setItem('faviconSrc', 'https://gitlab.com/arcade_v/arcade_v_images/-/raw/main/favicon/logo.png');
+}
+if (localStorage.getItem("pageTitle") == null) {
+    localStorage.setItem('pageTitle', 'Arcade 5');
+}
+if (localStorage.getItem("userFont") == null) {
+    localStorage.setItem('userFont', 'Pixelify Sans');
+}
+
+            </script><link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans&amp;family=Comic+Neue&amp;family=Courier+Prime&amp;family=Press+Start+2P&amp;family=VT323&amp;family=Orbitron:wght@400;700&amp;family=Roboto:wght@400;700&amp;family=Open+Sans:wght@400;700&amp;family=Patrick+Hand&amp;family=Russo+One&amp;display=swap"><title>Arcade 5</title><link id="dynamic-favicon" rel="icon" href="https://gitlab.com/arcade_v/arcade_v_images/-/raw/main/favicon/logo.png?v=1774147038392"></head><body style="font-family: &quot;Pixelify Sans&quot;;">
+<ul class="navbar">
+  <!-- Home -->
+  <li>
+    <a aria-label="Home" onclick="changePageContent('https://cdn.jsdelivr.net/npm/@arcade-v/arcade_v/navigation/home.html', () =&gt; {
+         appendScript('https://cdn.jsdelivr.net/npm/@arcade-v/arcade_v/navigation/home.js', () =&gt; {
+           if (typeof displayRandomQuote === 'function') {
+             displayRandomQuote();
+           }
+         });
